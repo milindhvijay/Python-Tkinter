@@ -147,4 +147,22 @@ class adminwindows:
 
     def clear_entries(self):
         self.Name_entry.delete(0,"end")
+        self.Phone_no_entry.delete(0, "end")
+        self.Address_entry.delete(0, "end")
+
+    def delete_record(self):
+        try:
+            self.theCursor.execute("delete FROM Students WHERE ID=?",(self,curItem['values'[0],))
+            print("Deleted")
+        except:
+            print("Delete Failed!")
+        finally:
+            self.curItem = 0
+            self.clear_entries()
+            self.update_tree()
+            self.sqlite_var.commit()
+        
+    def update_record(self):
+        if(self.Name_value.get()!="" and self.Address_value.get()!="" and self.Phone_no_value.get()!=""):
+            try:
 

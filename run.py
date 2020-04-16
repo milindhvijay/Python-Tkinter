@@ -96,7 +96,7 @@ class userwindows:
             self.search_value = StringVar(self.user_window, value="")
             Entry(self.user_window,textvariable=self.search_value).grid(row=5,column=2,pady=9,padx=9,sticky=W+E)
             self.search_button = ttk.Button(self.user_window,text="Search",command=self.search_record)
-            self.search_button.grid(row=5,column,padx=9,pady=9,sticky=W+E)
+            self.search_button.grid(row=5,column=3,padx=9,pady=9,sticky=W+E)
 
             self.refresh_button = ttk.Button(self.user_window,text="Refresh",command=self.refresh)
             self.search_button.grid(row=6,column=2,padx=9,pady=9,sticky=W+E)
@@ -117,7 +117,7 @@ class adminwindows:
         self.clear_entries()
         print("Refreshed")
 
-        def search_record(self):
+    def search_record(self):
         try:
             self.tree.delete(*self.tree.get_children())
             self.theCursor.execute("select * from Students where name like ? or phone like  ?",('%'+self.search_value.get()+'%','%'+self.search_value.get()+'%'))
@@ -139,7 +139,7 @@ class adminwindows:
 
     def reset_db(self):
         yesno=messagebox.askquestion("RESET DB", "All data in DB will be lost, continue?")
-        if(yesno='yes'):
+        if(yesno=='yes'):
             self.theCursor.execute("DROP TABLE Students")
             print("Database Reset")
             self.setup_db()
@@ -152,7 +152,7 @@ class adminwindows:
 
     def delete_record(self):
         try:
-            self.theCursor.execute("delete FROM Students WHERE ID=?",(self,curItem['values'[0],))
+            self.theCursor.execute("delete FROM Students WHERE ID=?",(self,curItem['values'][0]))
             print("Deleted")
         except:
             print("Delete Failed!")
@@ -165,4 +165,39 @@ class adminwindows:
     def update_record(self):
         if(self.Name_value.get()!="" and self.Address_value.get()!="" and self.Phone_no_value.get()!=""):
             try:
+                self.theCursor.execute("""UPDATE Students SET Name = ? ,Phone = ?,Address = ? WHERE ID= ? """,
+                (self.Name_value.get(),self.Phone_no_value.get(),self.Address_value.get(),self.curItem['values'][0]))
+                print("Update Records")
+            except sqlite3.IntegrityError:
+                messagebox.showerror("Duplicate","The Name already exists in the database")         
+            except:
+                print("Update Failed due to unkown reason !")
+            finally:              
+                self.update_tree()
+                self.sqlite_var.commit()
+        else:
+            messagebox.showwarning("EMPTY INPUT","PLEASE FILL ALL REQUIRED DATA BEFORE UPDATING")
 
+    def selectItem(self,event): 
+        self.curItem = self.tree.item(self.tree.focus())
+        print(self.curItem)
+        self.Name_value.set(self.curItem["values"][1])
+        self.Phone_no_value.set(self.curItem["values"][2])
+        self.Address_value.set(self.curItem["values"][3])
+   
+    def update_tree(self):
+        try:
+            self.tree.delete(*self.tree.get_children())
+            self.theCursor.execute("SELECT * FROM Students")
+            self.rows = self.theCursor.fetchall()
+            i=0
+            for row in self.rows:
+                if(i%2==0):
+                    self.tree.insert("",END, values=row,tag='1')
+                else:
+                    self.tree.insert("",END, values=row,tag='2')  
+                i=i+1                    
+        except:
+            print("Couldn't Update Data")
+
+    #def write_record(self):

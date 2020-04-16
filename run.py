@@ -139,4 +139,12 @@ class adminwindows:
 
     def reset_db(self):
         yesno=messagebox.askquestion("RESET DB", "All data in DB will be lost, continue?")
+        if(yesno='yes'):
+            self.theCursor.execute("DROP TABLE Students")
+            print("Database Reset")
+            self.setup_db()
+            self.update_tree()
+
+    def clear_entries(self):
+        self.Name_entry.delete(0,"end")
 

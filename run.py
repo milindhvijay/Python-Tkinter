@@ -416,7 +416,6 @@ class signinwindow:
         user_add=Button(self.signin_window,font="Ariel, 17",text="Add User",background='white',command=self.new_user)
         user_add.grid(row=1,column=2,rowspan=2,padx=20,pady=(0,20))
 
-        view_existing.grid(row=3,column=0,columnspan=4,padx=20,pady=(0,20),sticky=W+E)
         self.setup_db()
 
         self.signin_window.mainloop()
@@ -515,14 +514,6 @@ class mainwindow():
             signinwindow()
         except:
             raise Exception("COULD NOT OPEN SIGNUP_WINDOW")
-
-
-    def helpp(self):
-        import os,webbrowser
-        from urllib.request import pathname2url
-        url = 'file:{}'.format(pathname2url(os.path.abspath('help.html')))
-        webbrowser.open(url)
-
 
     def quit_window(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):

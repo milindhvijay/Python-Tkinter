@@ -32,7 +32,7 @@ class userwindow:
                     i=i+1
         except:
             raise
-            print("Couldn't search Data")
+            print("Couldn't find Data")
 
 
     def clear_entries(self):
@@ -135,13 +135,13 @@ class adminwindow:
                     i=i+1
         except:
             raise
-            print("Couldn't search Data")
+            print("Couldn't find Data")
 
     def reset_db(self):
         yesno=messagebox.askquestion("RESET DB","All data in DB will be lost, continue ?")
         if(yesno=='yes'):
             self.theCursor.execute("DROP TABLE Students")
-            print("Database Reseted")
+            print("Database Reset")
             self.setup_db()
             self.update_tree()
 
@@ -155,7 +155,7 @@ class adminwindow:
             self.theCursor.execute("delete FROM Students WHERE ID=?",(self.curItem['values'][0],))
             print("Deleted")
         except:
-            print("Delete Failed !")
+            print("Delete Failed!")
         finally:
             self.curItem=0
             self.clear_entries()
@@ -171,7 +171,7 @@ class adminwindow:
             except sqlite3.IntegrityError:
                 messagebox.showerror("Duplicate","The Name already exists in the database")
             except:
-                print("Update Failed due to unkown reason !")
+                print("Update Failed due to unkown reason!")
             finally:
                 self.update_tree()
                 self.sqlite_var.commit()
@@ -213,12 +213,12 @@ class adminwindow:
             except sqlite3.IntegrityError:
                 messagebox.showerror("Duplicate","The Name already exists in the database")
             except:
-                print("Data writing failed due to unknown reason")
+                print("Data write failed due to unknown reason")
             finally:
                 self.update_tree()
 
         else:
-            messagebox.showwarning("EMPTY INPUT","PLEASE FILL ALL REQUIRED DATA BEFORE SUBMITTING")
+            messagebox.showwarning("EMPTY INPUT","PLEASE FILL ALL REQUIRED DATA")
 
 
     def setup_db(self):
@@ -453,7 +453,7 @@ class loginwindow:
                     self.login_window.destroy()
                     userwindow()
                     flag=1
-            if(self.var.get()==2 and self.username_text.get()=="admin" and self.password_text.get()=="ajce"):
+            if(self.var.get()==2 and self.username_text.get()=="admin" and self.password_text.get()=="admin"):
                 self.login_window.destroy()
                 adminwindow()
                 flag=1

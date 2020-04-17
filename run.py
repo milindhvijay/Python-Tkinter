@@ -4,113 +4,10 @@ from tkinter import messagebox
 from PIL import ImageTk, Image
 import sqlite3
 
-class userwindows:
-    sqlite_var = 0 #variable to establish connection between python & sqlite3
-    theCursor = 0 #variable to store indexing cursor
-    curItem = 0 #variable to store currently active record
-
-    def refresh(self):
-        self.update_tree()
-        self.clear_entries()
-        print("Refreshed")
-
-    def search_record(self):
-        try:
-            self.tree.delete(*self.tree.get_children())
-            self.theCursor.execute("select * from Students where name like ? or phone like ?",('%'+self.search_value.get()+'%','%'+self.search_value.get()+'%'))
-            self.result = self.theCursor.fetchall()
-            length=str(len(self.result))
-            if(length==0):
-                messagebox.showinfo("Search Results","No results were found, try again using part of name or phone no")
-            if(length!='0'):
-                i=0
-                for row in self.result:
-                    if(i%2==0):
-                        self.tree.insert("",END, values=row,tag='1')
-                    else:
-                        self.tree.insert("",END, values=row,tag='2')
-                    i=i+1
-        except:
-            raise
-            print("Couldn't search Data")
-
-
-        def clear_entries(self):
-            self.search_value.set("")
-
-        def update_tree(self):
-            try:
-                self.tree.delete(*self.tree.get_children())
-                self.theCursor.execute("SELECT * FROM Students")
-                self.rows = self.theCursor.fetchall()
-                i=0
-                for row in self.rows:
-                    if(i%2==0):
-                        self.tree.insert("",END, values=row,tag='1')
-                    else:
-                        self.tree.insert("",END, values=row,tag='2')  
-                    i=i+1                    
-            except:
-                print("Couldn't Update Data")
-
-
-        def setup_db(self):
-            try:
-                self.sqlite_var = sqlite3.connect('student.db')
-                self.theCursor = self.sqlite_var.cursor()
-            except:
-                print("Could not establish connection to sqlite3")
-
-            try:
-                self.theCursor.execute("CREATE TABLE if not exists Students(ID INTEGER PRIMARY KEY AUTOINCREMENT , Name TEXT UNIQUE NOT NULL , Phone TEXT NOT NULL,Address TEXT NOT NULL);")
-            except:
-                print("ERROR : Table not created")
-            finally:
-                self.sqlite_var.commit()
-                self.update_tree()
-
-        def __init__(self):
-
-            self.user_windows=Tk()
-            self.user_windows.resizable(False, False)
-            self.user_windows.iconbitmap("logo.ico")
-            self.user_windows.title("REGISTRX")
-
-
-
-            # 5TH ROW
-            self.tree = ttk.Treeview(self.user_windows,selectmode="browse",column=("column1", "column2", "column3","column4"), show='headings')
-            self.tree.column1("column",width=100,minwidth=100,stretch=NO)
-            self.tree.heading("#1", text="ADMISSION")
-            self.tree.column("column2",width=180,minwidth=180,stretch=NO)
-            self.tree.heading("#2", text="NAME")
-            self.tree.column("column3",width=180,minwidth=180,stretch=NO)
-            self.tree.heading("#3", text="PHONE")
-            self.tree.column("column4",width=450,minwidth=450,stretch=NO)
-            self.tree.heading("#4", text="ADDRESS")
-            self.tree.tag_configure('1', background='ivory2')
-            self.tree.tag_configure('2', background='alice blue')
-            self.tree.grid(row=4,column=0,columnspan=4,sticky=W+E,padx=9,pady=9)
-
-            Label(self.user_windows,text="Search by Part of NAME or Phone No:").grid(row=5,column=0,columnspan=2,pady=9,padx=9,sticky=E)
-            self.search_value = StringVar(self.user_window, value="")
-            Entry(self.user_window,textvariable=self.search_value).grid(row=5,column=2,pady=9,padx=9,sticky=W+E)
-            self.search_button = ttk.Button(self.user_window,text="Search",command=self.search_record)
-            self.search_button.grid(row=5,column=3,padx=9,pady=9,sticky=W+E)
-
-            self.refresh_button = ttk.Button(self.user_window,text="Refresh",command=self.refresh)
-            self.search_button.grid(row=6,column=2,padx=9,pady=9,sticky=W+E)
-
-
-            self.setup_db()
-            self.user_window.mainloop()
-
-
-class adminwindows:
-
-    sqlite_var = 0 
-    theCursor = 0
-    curItem = 0
+class userwindow:
+    sqlite_var = 0 #variable to establish connection btw python and sqlite3
+    theCursor = 0  #variable to store the indexing cursor
+    curItem=0 #variable to store currently active record
 
     def refresh(self):
         self.update_tree()
@@ -131,60 +28,16 @@ class adminwindows:
                     if(i%2==0):
                         self.tree.insert("",END, values=row,tag='1')
                     else:
-                        self.tree.insert("",END, values=row,tag='2')  
-                    i=i+1                    
+                        self.tree.insert("",END, values=row,tag='2')
+                    i=i+1
         except:
             raise
             print("Couldn't search Data")
 
-    def reset_db(self):
-        yesno=messagebox.askquestion("RESET DB", "All data in DB will be lost, continue?")
-        if(yesno=='yes'):
-            self.theCursor.execute("DROP TABLE Students")
-            print("Database Reset")
-            self.setup_db()
-            self.update_tree()
 
     def clear_entries(self):
-        self.Name_entry.delete(0,"end")
-        self.Phone_no_entry.delete(0, "end")
-        self.Address_entry.delete(0, "end")
+        self.search_value.set("")
 
-    def delete_record(self):
-        try:
-            self.theCursor.execute("delete FROM Students WHERE ID=?",(self,curItem['values'][0]))
-            print("Deleted")
-        except:
-            print("Delete Failed!")
-        finally:
-            self.curItem = 0
-            self.clear_entries()
-            self.update_tree()
-            self.sqlite_var.commit()
-        
-    def update_record(self):
-        if(self.Name_value.get()!="" and self.Address_value.get()!="" and self.Phone_no_value.get()!=""):
-            try:
-                self.theCursor.execute("""UPDATE Students SET Name = ? ,Phone = ?,Address = ? WHERE ID= ? """,
-                (self.Name_value.get(),self.Phone_no_value.get(),self.Address_value.get(),self.curItem['values'][0]))
-                print("Update Records")
-            except sqlite3.IntegrityError:
-                messagebox.showerror("Duplicate","The Name already exists in the database")         
-            except:
-                print("Update Failed due to unkown reason !")
-            finally:              
-                self.update_tree()
-                self.sqlite_var.commit()
-        else:
-            messagebox.showwarning("EMPTY INPUT","PLEASE FILL ALL REQUIRED DATA BEFORE UPDATING")
-
-    def selectItem(self,event): 
-        self.curItem = self.tree.item(self.tree.focus())
-        print(self.curItem)
-        self.Name_value.set(self.curItem["values"][1])
-        self.Phone_no_value.set(self.curItem["values"][2])
-        self.Address_value.set(self.curItem["values"][3])
-   
     def update_tree(self):
         try:
             self.tree.delete(*self.tree.get_children())
@@ -195,14 +48,161 @@ class adminwindows:
                 if(i%2==0):
                     self.tree.insert("",END, values=row,tag='1')
                 else:
-                    self.tree.insert("",END, values=row,tag='2')  
-                i=i+1                    
+                    self.tree.insert("",END, values=row,tag='2')
+                i=i+1
+        except:
+            print("Couldn't Update Data")
+
+
+    def setup_db(self):
+        try:
+            self.sqlite_var = sqlite3.connect('student.db')
+            self.theCursor = self.sqlite_var.cursor()
+        except:
+            print("Could not establish connection to sqlite3")
+
+        try:
+            self.theCursor.execute("CREATE TABLE if not exists Students(ID INTEGER PRIMARY KEY AUTOINCREMENT , Name TEXT UNIQUE NOT NULL , Phone TEXT NOT NULL,Address TEXT NOT NULL);")
+        except:
+            print("ERROR : Table not created")
+        finally:
+            self.sqlite_var.commit()
+            self.update_tree()
+
+    def __init__(self):
+
+        self.user_window=Tk()
+        self.user_window.resizable(False, False)
+        self.user_window.iconbitmap("logo.ico")
+        self.user_window.title("REGISTER Database - User")
+
+
+
+        # ----- 5th Row -----
+        self.tree= ttk.Treeview(self.user_window,selectmode="browse",column=("column1", "column2", "column3","column4"), show='headings')
+        self.tree.column("column1",width=100,minwidth=100,stretch=NO)
+        self.tree.heading("#1", text="REGISTER NO.")
+        self.tree.column("column2",width=180,minwidth=180,stretch=NO)
+        self.tree.heading("#2", text="NAME")
+        self.tree.column("column3",width=180,minwidth=180,stretch=NO)
+        self.tree.heading("#3", text="PHONE")
+        self.tree.column("column4",width=450,minwidth=450,stretch=NO)
+        self.tree.heading("#4", text="ADDRESS")
+        self.tree.tag_configure('1', background='ivory2')
+        self.tree.tag_configure('2', background='alice blue')
+        self.tree.grid(row=4,column=0,columnspan=4,sticky=W+E,padx=9,pady=9)
+
+        Label(self.user_window,text="Search by NAME/PHONE NO.").grid(row=5,column=0,columnspan=2,pady=9,padx=9,sticky=E)
+        self.search_value = StringVar(self.user_window, value="")
+        Entry(self.user_window,textvariable=self.search_value).grid(row=5,column=2,pady=9,padx=9,sticky=W+E)
+        self.search_button = ttk.Button(self.user_window,text="Search",command=self.search_record)
+        self.search_button.grid(row=5,column=3,pady=9,padx=9,sticky=W+E)
+
+        self.refresh_button = ttk.Button(self.user_window,text="Refresh",command=self.refresh)
+        self.refresh_button.grid(row=6, column=2,padx=9,pady=9,sticky=W+E)
+
+
+        self.setup_db()
+        self.user_window.mainloop()
+
+
+class adminwindow:
+
+    sqlite_var = 0 #variable to establish connection btw python and sqlite3
+    theCursor = 0  #variable to store the indexing cursor
+    curItem=0 #variable to store currently active record
+
+    def refresh(self):
+        self.update_tree()
+        self.clear_entries()
+        print("Refreshed")
+
+    def search_record(self):
+        try:
+            self.tree.delete(*self.tree.get_children())
+            self.theCursor.execute("select * from Students where name like ? or phone like  ?",('%'+self.search_value.get()+'%','%'+self.search_value.get()+'%'))
+            self.result = self.theCursor.fetchall()
+            length=str(len(self.result))
+            if(length==0):
+                messagebox.showinfo("Search Results","No results were found, try again using part of name or phone no")
+            if(length!='0'):
+                i=0
+                for row in self.result:
+                    if(i%2==0):
+                        self.tree.insert("",END, values=row,tag='1')
+                    else:
+                        self.tree.insert("",END, values=row,tag='2')
+                    i=i+1
+        except:
+            raise
+            print("Couldn't search Data")
+
+    def reset_db(self):
+        yesno=messagebox.askquestion("RESET DB","All data in DB will be lost, continue ?")
+        if(yesno=='yes'):
+            self.theCursor.execute("DROP TABLE Students")
+            print("Database Reseted")
+            self.setup_db()
+            self.update_tree()
+
+    def clear_entries(self):
+        self.Name_entry.delete(0, "end")
+        self.Phone_no_entry.delete(0, "end")
+        self.Address_entry.delete(0, "end")
+
+    def delete_record(self):
+        try:
+            self.theCursor.execute("delete FROM Students WHERE ID=?",(self.curItem['values'][0],))
+            print("Deleted")
+        except:
+            print("Delete Failed !")
+        finally:
+            self.curItem=0
+            self.clear_entries()
+            self.update_tree()
+            self.sqlite_var.commit()
+
+    def update_record(self):
+        if(self.Name_value.get()!="" and self.Address_value.get()!="" and self.Phone_no_value.get()!=""):
+            try:
+                self.theCursor.execute("""UPDATE Students SET Name = ? ,Phone = ?,Address = ? WHERE ID= ? """,
+                (self.Name_value.get(),self.Phone_no_value.get(),self.Address_value.get(),self.curItem['values'][0]))
+                print("Update Records")
+            except sqlite3.IntegrityError:
+                messagebox.showerror("Duplicate","The Name already exists in the database")
+            except:
+                print("Update Failed due to unkown reason !")
+            finally:
+                self.update_tree()
+                self.sqlite_var.commit()
+        else:
+            messagebox.showwarning("EMPTY INPUT","PLEASE FILL ALL REQUIRED DATA BEFORE UPDATING")
+
+    def selectItem(self,event):
+        self.curItem = self.tree.item(self.tree.focus())
+        print(self.curItem)
+        self.Name_value.set(self.curItem["values"][1])
+        self.Phone_no_value.set(self.curItem["values"][2])
+        self.Address_value.set(self.curItem["values"][3])
+
+    def update_tree(self):
+        try:
+            self.tree.delete(*self.tree.get_children())
+            self.theCursor.execute("SELECT * FROM Students")
+            self.rows = self.theCursor.fetchall()
+            i=0
+            for row in self.rows:
+                if(i%2==0):
+                    self.tree.insert("",END, values=row,tag='1')
+                else:
+                    self.tree.insert("",END, values=row,tag='2')
+                i=i+1
         except:
             print("Couldn't Update Data")
 
     def write_record(self):
         if(self.Name_value.get()!="" and self.Address_value.get()!="" and self.Phone_no_value.get()!=""):
-            try:         
+            try:
                 self.theCursor.execute("""INSERT INTO Students (Name, Phone,Address) VALUES (?,?,?)""",
                 (self.Name_value.get(),self.Phone_no_value.get(),self.Address_value.get()))
                 self.sqlite_var.commit()
@@ -220,6 +220,7 @@ class adminwindows:
         else:
             messagebox.showwarning("EMPTY INPUT","PLEASE FILL ALL REQUIRED DATA BEFORE SUBMITTING")
 
+
     def setup_db(self):
         try:
             self.sqlite_var = sqlite3.connect('student.db')
@@ -230,20 +231,19 @@ class adminwindows:
         try:
             self.theCursor.execute("CREATE TABLE if not exists Students(ID INTEGER PRIMARY KEY AUTOINCREMENT , Name TEXT UNIQUE NOT NULL , Phone TEXT NOT NULL,Address TEXT NOT NULL);")
         except:
-            print("ERROR : Table Not Created")
+            print("ERROR : Table not created")
         finally:
             self.sqlite_var.commit()
             self.update_tree()
-
 
     def __init__(self):
 
         self.admin_window=Tk()
         self.admin_window.resizable(False, False)
         self.admin_window.iconbitmap("logo.ico")
-        self.admin_window.title("REGISTRX Database - Admin")
+        self.admin_window.title("REGISTER Database - Admin")
 
-        #1st Row
+        # ----- 1st Row -----
         self.Name_Label = Label(self.admin_window, text="Name")
         self.Name_Label.grid(row=0, column=0, padx=10, pady=10, sticky=W)
 
@@ -251,41 +251,41 @@ class adminwindows:
         self.Name_value = StringVar(self.admin_window, value="")
         self.Name_entry = ttk.Entry(self.admin_window,textvariable=self.Name_value)
         self.Name_entry.grid(row=0, column=1,columnspan=2,padx=10, pady=10,sticky=W+E)
- 
 
-        #2nd Row
+
+        # ----- 2nd Row -----
         self.Phone_Label = Label(self.admin_window, text="Phone No.")
         self.Phone_Label.grid(row=1, column=0, padx=10, pady=10, sticky=W)
- 
+
         # Will hold the changing value stored last name
         self.Phone_no_value = StringVar(self.admin_window, value="")
         self.Phone_no_entry = ttk.Entry(self.admin_window,textvariable=self.Phone_no_value)
         self.Phone_no_entry.grid(row=1, column=1,columnspan=2, padx=10, pady=10, sticky=W+E)
 
 
-             #3rd Row
+             # ----- 3rd Row -----
         self.Adress_Label = Label(self.admin_window, text="Address")
         self.Adress_Label.grid(row=2, column=0, padx=10, pady=10, sticky=W)
- 
+
         # Will hold the changing value stored last name
         self.Address_value = StringVar(self.admin_window, value="")
         self.Address_entry = ttk.Entry(self.admin_window,textvariable=self.Address_value)
         self.Address_entry.grid(row=2, column=1,columnspan=2, padx=10, pady=10, sticky=W+E)
- 
-        #4th Row
+
+        # ----- 4rd Row -----
         self.submit_button = ttk.Button(self.admin_window,text="Submit",command=self.write_record)
         self.submit_button.grid(row=0, column=3,padx=9, sticky=W+E)
- 
+
         self.update_button = ttk.Button(self.admin_window,text="Update",command=self.update_record)
         self.update_button.grid(row=1, column=3,padx=9, sticky=W+E)
- 
+
         self.delete_button = ttk.Button(self.admin_window,text="Delete",command=self.delete_record)
         self.delete_button.grid(row=2, column=3,padx=9, sticky=W+E)
 
-        #5th Row
+        # ----- 5th Row -----
         self.tree= ttk.Treeview(self.admin_window,selectmode="browse",column=("column1", "column2", "column3","column4"), show='headings')
         self.tree.column("column1",width=100,minwidth=100,stretch=NO)
-        self.tree.heading("#1", text="ADMISSION")
+        self.tree.heading("#1", text="REGISTER NO.")
         self.tree.column("column2",width=180,minwidth=180,stretch=NO)
         self.tree.heading("#2", text="NAME")
         self.tree.column("column3",width=180,minwidth=180,stretch=NO)
@@ -298,7 +298,7 @@ class adminwindows:
         self.tree.tag_configure('2', background='alice blue')
         self.tree.grid(row=4,column=0,columnspan=4,sticky=W+E,padx=9,pady=9)
 
-        Label(self.admin_window,text="Search by Part of NAME or PHONE no").grid(row=5,column=0,columnspan=2,pady=9,padx=9,sticky=E)
+        Label(self.admin_window,text="Search by NAME/PHONE NO.").grid(row=5,column=0,columnspan=2,pady=9,padx=9,sticky=E)
         self.search_value = StringVar(self.admin_window, value="")
         Entry(self.admin_window,textvariable=self.search_value).grid(row=5,column=2,pady=9,padx=9,sticky=W+E)
         self.search_button = ttk.Button(self.admin_window,text="Search",command=self.search_record)
@@ -307,7 +307,6 @@ class adminwindows:
         self.refresh_button = ttk.Button(self.admin_window,text="Refresh",command=self.refresh)
         self.refresh_button.grid(row=6, column=2,padx=9,pady=9,sticky=W+E)
 
-        Label(self.admin_window,text="Developed by KEVIN TONY").grid(row=6,column=0,pady=9,padx=9,sticky=W)
         self.reset_button = ttk.Button(self.admin_window,text="Reset Database",command=self.reset_db)
         self.reset_button.grid(row=6, column=3,padx=9,pady=9,sticky=W+E)
 
@@ -319,7 +318,7 @@ class adminwindows:
 class signinwindow:
     sqlite_var = 0 #variable to establish connection btw python and sqlite3
     theCursor = 0  #variable to store the indexing cursor
-    curItem = 0 #variable to store currently active record
+    curItem=0 #variable to store currently active record
 
     def setup_db(self):
         try:
@@ -417,18 +416,17 @@ class signinwindow:
         user_add=Button(self.signin_window,font="Ariel, 17",text="Add User",background='white',command=self.new_user)
         user_add.grid(row=1,column=2,rowspan=2,padx=20,pady=(0,20))
 
-        view_existing=Button(self.signin_window,text="View Existing Users",background='white',command=self.view_users)
         view_existing.grid(row=3,column=0,columnspan=4,padx=20,pady=(0,20),sticky=W+E)
         self.setup_db()
 
-        self.signin_window.mainloop()     
+        self.signin_window.mainloop()
 
 
 
 class loginwindow:
     sqlite_var = 0 #variable to establish connection btw python and sqlite3
     theCursor = 0  #variable to store the indexing cursor
-    curItem = 0 #variable to store currently active record
+    curItem=0 #variable to store currently active record
 
     def setup_db(self):
         try:
@@ -442,7 +440,7 @@ class loginwindow:
         except:
             print("ERROR : Table not created")
         finally:
-            self.sqlite_var.commit()    
+            self.sqlite_var.commit()
 
 
     def logg(self):
@@ -494,12 +492,11 @@ class loginwindow:
         Radiobutton(self.login_window,text="User",variable=self.var,value=1).grid(row=3,column=0,pady=15)
         Radiobutton(self.login_window,text="Admin",variable=self.var,value=2).grid(row=3,column=1)
 
-        Label(self.login_window,text="DEFAULT ADMIN\t{ Username : 'admin' and Password : 'ajce' }",font="Ariel, 7").grid(row=4,column=0,columnspan=3,sticky=W,pady=(5,0),padx=(3,9))
         Label(self.login_window,text="To login as user Sign-Up from file menu of main window",font="Ariel, 7").grid(row=5,column=0,columnspan=3,sticky=W,pady=(0,5),padx=(3,9))
 
         self.setup_db()
 
-        self.login_window.mainloop()    
+        self.login_window.mainloop()
 
 
 class mainwindow():
@@ -536,15 +533,13 @@ class mainwindow():
         self.root.resizable(False, False)
         self.root.protocol("WM_DELETE_WINDOW",self.quit_window)
         self.root.iconbitmap("logo.ico")
-        self.root.title("REGISTRX")
+        self.root.title("REGISTER")
         self.img = ImageTk.PhotoImage(Image.open("logo.png"))
         self.panel = Label(self.root, image = self.img)
         self.panel.grid(row=0,column=0)
 
-        Label(self.root,text="REGISTRX",font="Times, 20",foreground='blue').grid(row=1,column=0,sticky=W+E,padx=40)
+        Label(self.root,text="REGISTER",font="Times, 20",foreground='blue').grid(row=1,column=0,sticky=W+E,padx=40)
         Label(self.root,text="STUDENT REGISTRATION APP",font="Times, 29",foreground='red4').grid(row=2,column=0,sticky=W+E,padx=40)
-        Label(self.root,text="This app offers an easy way to manage student records",
-        font="Ariel, 12").grid(row=3,column=0,columnspan=2,sticky=W+E,pady=30)
         Label(self.root,text="PLEASE LOGIN TO CONTINUE",
         font="Ariel, 18").grid(row=4,column=0,columnspan=2,sticky=W+E,pady=5)
         self.but=Button(self.root,text="LOGIN",command=self.create_login)
@@ -561,20 +556,10 @@ class mainwindow():
         self.file_menu.add_command(label="Quit",command=self.quit_window)
         self.menu_bar.add_cascade(label="File",menu=self.file_menu)
 
-        self.menu_bar.add_separator()
-
-        self.help_menu=Menu(self.menu_bar,tearoff=0)
-        self.help_menu.add_command(label="Help",command=self.helpp)
-        self.help_menu.add_separator()
-        self.help_menu.add_command(label="About Us",command=self.about_us)
-        self.menu_bar.add_cascade(label="Help",menu=self.help_menu)
-
         self.root.config(menu=self.menu_bar)
         self.root.mainloop()
 
 try:
     mainwindow()
 except:
-    raise Exception("COULD NOT CREATE MAIN_WINDOW")                   
-
-
+    raise Exception("COULD  NOT CREATE MAIN_WINDOW")

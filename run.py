@@ -7,7 +7,7 @@ import sqlite3
 class userwindow:
     sqlite_var = 0 #variable to establish connection btw python and sqlite3
     theCursor = 0  #variable to store the indexing cursor
-    curItem=0 #variable to store currently active record
+    curItem = 0 #variable to store currently active record
 
     def refresh(self):
         self.update_tree()
@@ -78,7 +78,7 @@ class userwindow:
 
 
 
-        # ----- 5th Row -----
+        #5th Row
         self.tree= ttk.Treeview(self.user_window,selectmode="browse",column=("column1", "column2", "column3","column4"), show='headings')
         self.tree.column("column1",width=100,minwidth=100,stretch=NO)
         self.tree.heading("#1", text="REGISTER NO.")
@@ -110,7 +110,7 @@ class adminwindow:
 
     sqlite_var = 0 #variable to establish connection btw python and sqlite3
     theCursor = 0  #variable to store the indexing cursor
-    curItem=0 #variable to store currently active record
+    curItem = 0 #variable to store currently active record
 
     def refresh(self):
         self.update_tree()
@@ -243,7 +243,7 @@ class adminwindow:
         self.admin_window.iconbitmap("logo.ico")
         self.admin_window.title("REGISTER Database - Admin")
 
-        # ----- 1st Row -----
+        #1st Row
         self.Name_Label = Label(self.admin_window, text="Name")
         self.Name_Label.grid(row=0, column=0, padx=10, pady=10, sticky=W)
 
@@ -253,7 +253,7 @@ class adminwindow:
         self.Name_entry.grid(row=0, column=1,columnspan=2,padx=10, pady=10,sticky=W+E)
 
 
-        # ----- 2nd Row -----
+        #2nd Row
         self.Phone_Label = Label(self.admin_window, text="Phone No.")
         self.Phone_Label.grid(row=1, column=0, padx=10, pady=10, sticky=W)
 
@@ -263,7 +263,7 @@ class adminwindow:
         self.Phone_no_entry.grid(row=1, column=1,columnspan=2, padx=10, pady=10, sticky=W+E)
 
 
-             # ----- 3rd Row -----
+             #3rd Row
         self.Adress_Label = Label(self.admin_window, text="Address")
         self.Adress_Label.grid(row=2, column=0, padx=10, pady=10, sticky=W)
 
@@ -272,7 +272,7 @@ class adminwindow:
         self.Address_entry = ttk.Entry(self.admin_window,textvariable=self.Address_value)
         self.Address_entry.grid(row=2, column=1,columnspan=2, padx=10, pady=10, sticky=W+E)
 
-        # ----- 4rd Row -----
+        #4th Row
         self.submit_button = ttk.Button(self.admin_window,text="Submit",command=self.write_record)
         self.submit_button.grid(row=0, column=3,padx=9, sticky=W+E)
 
@@ -282,7 +282,7 @@ class adminwindow:
         self.delete_button = ttk.Button(self.admin_window,text="Delete",command=self.delete_record)
         self.delete_button.grid(row=2, column=3,padx=9, sticky=W+E)
 
-        # ----- 5th Row -----
+        #5th Row
         self.tree= ttk.Treeview(self.admin_window,selectmode="browse",column=("column1", "column2", "column3","column4"), show='headings')
         self.tree.column("column1",width=100,minwidth=100,stretch=NO)
         self.tree.heading("#1", text="REGISTER NO.")
@@ -318,7 +318,7 @@ class adminwindow:
 class signinwindow:
     sqlite_var = 0 #variable to establish connection btw python and sqlite3
     theCursor = 0  #variable to store the indexing cursor
-    curItem=0 #variable to store currently active record
+    curItem = 0 #variable to store currently active record
 
     def setup_db(self):
         try:
@@ -426,7 +426,7 @@ class signinwindow:
 class loginwindow:
     sqlite_var = 0 #variable to establish connection btw python and sqlite3
     theCursor = 0  #variable to store the indexing cursor
-    curItem=0 #variable to store currently active record
+    curItem = 0 #variable to store currently active record
 
     def setup_db(self):
         try:
